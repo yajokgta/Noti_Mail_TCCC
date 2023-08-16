@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Noti_Mail_TCCC
 {
-    internal class Program
+    public class Program
     {
-        static void Main(string[] args)
+
+        static async Task Main(string[] args)
         {
+            await CoreProcess.coreProcess();
         }
     }
 }

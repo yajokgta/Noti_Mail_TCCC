@@ -11,5 +11,14 @@ namespace Noti_Mail_TCCC
     {
         public static string connectionString = ConfigurationSettings.AppSettings["ConnectionString"];
         public static string destDucumentCode = ConfigurationSettings.AppSettings["DestDocumentCode"];
+
+        //SMTP Config
+        public static string _SMTPServer = ConfigurationSettings.AppSettings["SMTPServer"];
+        public static string _SMTPPort = ConfigurationSettings.AppSettings["SMTPPort"];
+        public static string _SMTPEnableSSL = ConfigurationSettings.AppSettings["SMTPEnableSSL"];
+        public static string _SMTPUser = ConfigurationSettings.AppSettings["SMTPUser"];
+        public static string _SMTPPassword = ConfigurationSettings.AppSettings["SMTPPassword"];
+        public static string _DisplayName = ConfigurationSettings.AppSettings["DisplayName"];
+        //SMTP Config
     }
 }

@@ -47,11 +47,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AdvanceFormExt.cs" />
-    <Compile Include="CoreProcess.cs" />
+    <Compile Include="CARModel.cs" />
+    <Compile Include="Extensions\AdvanceFormExt.cs" />
+    <Compile Include="Managers\CoreProcess.cs" />
     <Compile Include="LoadAppConfig.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Managers\SendEmail.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>

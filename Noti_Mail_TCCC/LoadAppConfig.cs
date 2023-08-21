@@ -11,6 +11,7 @@ namespace Noti_Mail_TCCC
     {
         public static string connectionString = ConfigurationSettings.AppSettings["ConnectionString"];
         public static string destDucumentCode = ConfigurationSettings.AppSettings["DestDocumentCode"];
+        public static string mailToTestMode = ConfigurationSettings.AppSettings["MailToTestMode"];
 
         //SMTP Config
         public static string _SMTPServer = ConfigurationSettings.AppSettings["SMTPServer"];

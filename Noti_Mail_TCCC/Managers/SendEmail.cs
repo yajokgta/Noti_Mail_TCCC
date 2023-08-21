@@ -16,49 +16,43 @@ namespace Noti_Mail_TCCC
         {
             _dbcontext = dbcontext;
         }
+
         public static async Task sendEmail(string Body, string MailTo, string subject)
         {
-            try
+            MailTo = await InfomationMailTo(MailTo);
+            SmtpClient smtpClient = new SmtpClient();
+            NetworkCredential basicCredential = new NetworkCredential(_SMTPUser, _SMTPPassword);
+            MailMessage message = new MailMessage();
+            MailAddress fromAddress = new MailAddress(_SMTPUser, _DisplayName);
+
+            smtpClient.Host = _SMTPServer;
+            smtpClient.UseDefaultCredentials = false;
+            smtpClient.Credentials = basicCredential;
+            smtpClient.EnableSsl = Convert.ToBoolean(_SMTPEnableSSL);
+            smtpClient.Port = Convert.ToInt32(_SMTPPort);
+
+            message.From = fromAddress;
+            //message.CC = sCc;
+            message.Subject = subject;
+
+            //Set IsBodyHtml to true means you can send HTML email.
+            message.IsBodyHtml = true;
+
+            message.Priority = MailPriority.High;
+            message.Body = Body;
+
+            string[] mail = MailTo.Split(',');
+
+            foreach (string s in mail)
             {
-                MailTo = await InfomationMailTo(MailTo);
-                SmtpClient smtpClient = new SmtpClient();
-                NetworkCredential basicCredential = new NetworkCredential(_SMTPUser, _SMTPPassword);
-                MailMessage message = new MailMessage();
-                MailAddress fromAddress = new MailAddress(_SMTPUser, _DisplayName);
-
-                smtpClient.Host = _SMTPServer;
-                smtpClient.UseDefaultCredentials = false;
-                smtpClient.Credentials = basicCredential;
-                smtpClient.EnableSsl = Convert.ToBoolean(_SMTPEnableSSL);
-                smtpClient.Port = Convert.ToInt32(_SMTPPort);
-
-                message.From = fromAddress;
-                //message.CC = sCc;
-                message.Subject = subject;
-
-                //Set IsBodyHtml to true means you can send HTML email.
-                message.IsBodyHtml = true;
-
-                message.Priority = MailPriority.High;
-                message.Body = Body;
-
-                string[] mail = MailTo.Split(',');
-
-                foreach (string s in mail)
+                if (s != "")
                 {
-                    if (s != "")
-                    {
-                        message.Bcc.Add(new MailAddress(s));
-                    }
+                    message.Bcc.Add(new MailAddress(s));
                 }
+            }
 
-                message.Sender = fromAddress;
-                await smtpClient.SendMailAsync(message);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+            message.Sender = fromAddress;
+            await smtpClient.SendMailAsync(message);
         }
 
         public static async Task<string> InfomationMailTo (string To)

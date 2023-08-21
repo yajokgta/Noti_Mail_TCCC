@@ -22,8 +22,11 @@ namespace Noti_Mail_TCCC
         {
             var templateModel = _dbContext.MSTTemplates.FirstOrDefault(x => x.DocumentCode == destDucumentCode);
 
+
             if (templateModel != null)
             {
+                Console.WriteLine(templateModel.DocumentCode);
+
                 var listTrnMemo = _dbContext.TRNMemos.Where(x => x.TemplateId == templateModel.TemplateId && 
                 (x.StatusName == Status._WaitForRequestorReview || x.StatusName != Status._Completed) 
                 && x.StatusName != Status._Draft
@@ -32,29 +35,54 @@ namespace Noti_Mail_TCCC
 
                 if (listTrnMemo.Any())
                 {
+                    Console.WriteLine(listTrnMemo.Count);
                     var listCarModel = validateMemo(listTrnMemo).OrderByDescending(x => x.Status_Name).ToList();
 
                     if (listCarModel.Any())
                     {
+                        Console.WriteLine(listCarModel.Count);
+
                         foreach (var itemCar in listCarModel)
                         {
                             var listLineApprove = _dbContext.TRNLineApproves.Where(x => x.MemoId == itemCar.MemoId).Select(y => y.NameEn).ToList();
 
-                            var mailTo = string.Join(",",listLineApprove);
+                            Console.WriteLine("MemoId = "+itemCar.MemoId);
+
+                            var mailTo = string.Join(",", listLineApprove);
+
+                            if (!string.IsNullOrEmpty(mailToTestMode))
+                            {
+                                mailTo = mailToTestMode;
+                            }
 
                             if (itemCar.Status_Name == Status._WaitForRequestorReview && itemCar.RequestDate_CountDay >= 21 && itemCar.RequestDate_CountDay <= 23)
                             {
                                 var mstEmailTemplate = _dbContext.MSTEmailTemplates.FirstOrDefault(x => x.FormState == CARType.Remind);
+                                var body = ReplaceEmilBody(mstEmailTemplate.EmailBody, itemCar, CARType.Remind);
+                                var subject = ReplaceEmilSubject(mstEmailTemplate.EmailSubject, itemCar);
+
+                                await SendEmail.sendEmail(body, mailTo, subject);
+                                Console.WriteLine("Send Request");
                             }
 
                             if (itemCar.Status_Name != Status._WaitForRequestorReview && itemCar.Audition_CountDay >= -5 && itemCar.Audition_CountDay <= -2)
                             {
                                 var mstEmailTemplate = _dbContext.MSTEmailTemplates.FirstOrDefault(x => x.FormState == CARType.Audition);
+                                var body = ReplaceEmilBody(mstEmailTemplate.EmailBody, itemCar, CARType.Audition);
+                                var subject = ReplaceEmilSubject(mstEmailTemplate.EmailSubject, itemCar);
+
+                                await SendEmail.sendEmail(body, mailTo, subject);
+                                Console.WriteLine("Send Audition");
                             }
 
                             if (itemCar.Status_Name != Status._WaitForRequestorReview && itemCar.Preventive_Action_CountDay >= -5 && itemCar.Preventive_Action_CountDay <= -2)
                             {
                                 var mstEmailTemplate = _dbContext.MSTEmailTemplates.FirstOrDefault(x => x.FormState == CARType.Preventive);
+                                var body = ReplaceEmilBody(mstEmailTemplate.EmailBody, itemCar, CARType.Preventive);
+                                var subject = ReplaceEmilSubject(mstEmailTemplate.EmailSubject, itemCar);
+
+                                await SendEmail.sendEmail(body, mailTo, subject);
+                                Console.WriteLine("Send Preventive");
                             }
                         }
                     }
@@ -162,15 +190,15 @@ namespace Noti_Mail_TCCC
             switch (type)
             {
                 case CARType.Remind:
-                    body.Replace("[DUEDATE]", item.RequestDate.AddDays(20).ToString("dd/MMM/yyyy"));
+                    body = body.Replace("[DUEDATE]", item.RequestDate.AddDays(20).ToString("dd/MMM/yyyy"));
                     break;
 
                 case CARType.Audition:
-                    body.Replace("[DUEDATE]", item.Audition.ToString("dd/MMM/yyyy"));
+                    body = body.Replace("[DUEDATE]", item.Audition.ToString("dd/MMM/yyyy"));
                     break;
 
                 case CARType.Preventive:
-                    body.Replace("[DUEDATE]", item.Preventive_Action.ToString("dd/MMM/yyyy"));
+                    body = body.Replace("[DUEDATE]", item.Preventive_Action.ToString("dd/MMM/yyyy"));
                     break;
             }
 

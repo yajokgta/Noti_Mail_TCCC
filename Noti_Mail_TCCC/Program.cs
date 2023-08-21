@@ -14,6 +14,7 @@ namespace Noti_Mail_TCCC
         static async Task Main(string[] args)
         {
             await CoreProcess.coreProcess();
+            Thread.Sleep(5000);
         }
     }
 }
